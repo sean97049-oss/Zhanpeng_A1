@@ -54,6 +54,31 @@
             <button type="button" class="btn btn-secondary" @click="clearAgain">Clear</button>
           </div>
         </form>
+
+
+        <div class="row mt-5" v-if="submittedCards.length">
+          <div class="col-12">
+            <h4>User List</h4>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Password</th>
+                  <th>Role</th>
+                  <th>Gender</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(card, index) in submittedCards" :key="index">
+                  <td>{{ card.userEmail }}</td>
+                  <td>{{ card.password }}</td>
+                  <td>{{ card.role }}</td>
+                  <td>{{ card.gender }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -69,6 +94,11 @@ const formData = ref({
   role: '',
   gender: ''
 });
+
+const submittedCards = ref([]);
+
+
+
 
 
 const errors = ref({
@@ -130,9 +160,9 @@ const isvaildPassword = (blur) => {
 
 
 const submitForm = () => {
-  console.log('Form submitted:', formData.value);
-
-  alert('Login attempt with: ' + JSON.stringify(formData.value));
+  submittedCards.value.push({
+    ...formData.value
+  });
 };
 
 
@@ -151,19 +181,19 @@ const clearAgain = () => {
 
 <style scoped>
 .container {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
 
 .form-label {
-  font-weight: 500;
+  font-weight: 480;
   margin-bottom: 5px;
 }
 
 .btn {
-  padding: 10px 20px;
-  margin: 5px;
+  padding: 15px 25px;
+  margin: 20px;
 }
 
 .form-control,
@@ -176,11 +206,11 @@ const clearAgain = () => {
 .form-control:focus,
 .form-select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #b3d8ff;
+
 }
 
-/* 验证错误样式 */
+
 .is-invalid {
   border-color: #dc3545 !important;
 }
@@ -190,6 +220,6 @@ const clearAgain = () => {
   width: 100%;
   margin-top: 0.25rem;
   font-size: 0.875em;
-  color: #dc3545;
+  color: #ea3f50;
 }
 </style>
