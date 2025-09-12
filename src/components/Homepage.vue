@@ -2,7 +2,7 @@
   <div class="container mt-5">
     <div class='row'>
       <div class='col-md-8 offset-md-2'>
-        <h2 class='text-center'>Login to Diabetes Support</h2>
+        <h2 class='text-center'>Diabetes Support</h2>
 
         <!-- login function -->
         <form @submit.prevent="submitForm">
@@ -29,6 +29,17 @@
           </div>
 
           <div class="row mb-3">
+            <label for="confirmPassword" class="form-label">confirm Password</label>
+            <input type="password" id="confirmPassword" class="form-control" v-model="formData.confirmPassword"
+              @blur="validateConfirmPassword(true)" placeholder="please confirm your password" />
+            <div v-if="errors.confirmPassword" class="text-danger">
+              {{ errors.confirmPassword }}
+            </div>
+          </div>
+
+
+
+          <div class="row mb-3">
             <label for="userRole" class="form-label">please select your login role</label>
             <select id="userRole" class="form-select" v-model="formData.role" required>
               <option disabled value="">Select one</option>
@@ -50,7 +61,7 @@
           </div>
 
           <div class="text-center">
-            <button type="submit" class="btn btn-primary me-2">Login</button>
+            <button type="submit" class="btn btn-primary me-2">Login/register</button>
             <button type="button" class="btn btn-secondary" @click="clearAgain">Clear</button>
           </div>
         </form>
@@ -64,6 +75,7 @@
                 <tr>
                   <th>Email</th>
                   <th>Password</th>
+                  <th>Confirm Password</th>
                   <th>Role</th>
                   <th>Gender</th>
                 </tr>
@@ -72,6 +84,7 @@
                 <tr v-for="(card, index) in submittedCards" :key="index">
                   <td>{{ card.userEmail }}</td>
                   <td>{{ card.password }}</td>
+                  <td>{{ card.confirmPassword }}</td>
                   <td>{{ card.role }}</td>
                   <td>{{ card.gender }}</td>
                 </tr>
@@ -92,6 +105,7 @@ const formData = ref({
   userEmail: '',
   password: '',
   role: '',
+  confirmPassword: '',
   gender: ''
 });
 
@@ -105,6 +119,7 @@ const errors = ref({
   userEmail: '',
   password: '',
   role: '',
+  confirmPassword: '',
   gender: ''
 });
 
@@ -118,6 +133,18 @@ const isvaildEmail = (blur) => {
 }
 
 
+const validateConfirmPassword = (showError = false) => {
+  const password = formData.value.password;
+  const confirm = formData.value.confirmPassword;
+
+  errors.value.confirmPassword = '';
+  if (showError && confirm !== password) {
+    errors.value.confirmPassword = 'Passwords do not match';
+    return false;
+  }
+  return true;
+};
+
 const isvaildPassword = (blur) => {
   const password = formData.value.password;
   const minLength = 8;
@@ -130,6 +157,7 @@ const isvaildPassword = (blur) => {
     }
     return false;
   }
+
 
 
   if (!/[A-Z]/.test(password)) {
@@ -160,9 +188,13 @@ const isvaildPassword = (blur) => {
 
 
 const submitForm = () => {
-  submittedCards.value.push({
-    ...formData.value
-  });
+  const okEmail = isvaildEmail(true);
+  const okPwd = isvaildPassword(true);
+  const okConfirm = validateConfirmPassword(true);
+
+  if (!okEmail || !okPwd || !okConfirm) return;
+
+  submittedCards.value.push({ ...formData.value });
 };
 
 
@@ -170,11 +202,13 @@ const clearAgain = () => {
   formData.value.userEmail = '';
   formData.value.password = '';
   formData.value.role = '';
+  formData.value.confirmPassword = '';
   formData.value.gender = '';
 
   errors.value.userEmail = '';
   errors.value.password = '';
   errors.value.role = '';
+  errors.value.confirmPassword = '';
   errors.value.gender = '';
 };
 </script>
