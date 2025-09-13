@@ -1,4 +1,5 @@
 import './assets/main.css'
+import router from './router'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -10,9 +11,10 @@ import Column from 'primevue/column'
 import Aura from '@primeuix/themes/aura'
 
 const app = createApp(App)
+app.use(router)
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
   },
 })
-createApp(App).mount('#app')
+app.mount('#app')

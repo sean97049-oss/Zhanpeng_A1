@@ -99,7 +99,11 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/components/composables/auth'
 
+const router = useRouter()
+const { login } = useAuth()
 
 const formData = ref({
   userEmail: '',
@@ -125,11 +129,13 @@ const errors = ref({
 
 
 const isvaildEmail = (blur) => {
-  if (formData.value.userEmail.length < 3) {
-    if (blur) errors.value.userEmail = 'Email must be at least 3 characters';
-  } else {
-    errors.value.userEmail = '';
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.userEmail)
+  if (!ok && blur) {
+    errors.value.userEmail = 'Please enter a valid email'
+  } else if (ok) {
+    errors.value.userEmail = ''
   }
+  return ok
 }
 
 
@@ -188,14 +194,30 @@ const isvaildPassword = (blur) => {
 
 
 const submitForm = () => {
-  const okEmail = isvaildEmail(true);
-  const okPwd = isvaildPassword(true);
-  const okConfirm = validateConfirmPassword(true);
+  const okEmail = isvaildEmail(true)
+  const okPwd = isvaildPassword(true)
+  const okConfirm = validateConfirmPassword(true)
+  if (!okEmail || !okPwd || !okConfirm) return
 
-  if (!okEmail || !okPwd || !okConfirm) return;
+  const { ok, msg } = login(formData.value.userEmail, formData.value.password)
+  if (!ok) {
+    errors.value.password = msg || 'Invalid email or password'
+    return
+  }
 
-  submittedCards.value.push({ ...formData.value });
-};
+  submittedCards.value.push({
+    userEmail: formData.value.userEmail,
+    password: '********',
+    confirmPassword: '********',
+    role: formData.value.role,
+    gender: formData.value.gender
+  })
+
+  formData.value.password = ''
+  formData.value.confirmPassword = ''
+
+  router.push('/about')
+}
 
 
 const clearAgain = () => {

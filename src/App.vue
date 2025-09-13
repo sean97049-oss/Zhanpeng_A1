@@ -2,12 +2,18 @@
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import Homepage from './components/Homepage.vue';
+import Header from './components/Header.vue'
 </script>
 
 <template>
-
-  <Homepage />
-
+  <div class="main-container">
+    <header>
+      <Header />
+    </header>
+    <main class="main-box">
+      <router-view></router-view>
+    </main>
+  </div>
 </template>
 
 <style scoped>
