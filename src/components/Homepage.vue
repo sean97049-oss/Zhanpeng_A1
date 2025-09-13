@@ -12,7 +12,7 @@
             </label>
             <input type="email" id="userEmail" class="form-control" :class="{ 'is-invalid': errors.userEmail }"
               v-model="formData.userEmail" @blur="isvaildEmail(true)" @input="isvaildEmail(false)" required
-              placeholder="useremail@gmail.com" />
+              autocomplete="email" spellcheck="false" maxlength="100" placeholder="useremail@gmail.com" />
             <div v-if="errors.userEmail" class="invalid-feedback">
               {{ errors.userEmail }}
             </div>
@@ -22,7 +22,8 @@
             <label for="inputPassword" class="form-label">Password</label>
             <input type="password" id="inputPassword" class="form-control" :class="{ 'is-invalid': errors.password }"
               required v-model="formData.password" @blur="isvaildPassword(true)" @input="isvaildPassword(false)"
-              minlength="8" placeholder="please enter your password" />
+              minlength="8" maxlength="50" autocomplete="current-password" spellcheck="false"
+              placeholder="please enter your password" />
             <div v-if="errors.password" class="invalid-feedback">
               {{ errors.password }}
             </div>
@@ -31,7 +32,8 @@
           <div class="row mb-3">
             <label for="confirmPassword" class="form-label">confirm Password</label>
             <input type="password" id="confirmPassword" class="form-control" v-model="formData.confirmPassword"
-              @blur="validateConfirmPassword(true)" placeholder="please confirm your password" />
+              @blur="validateConfirmPassword(true)" maxlength="50" autocomplete="new-password" spellcheck="false"
+              placeholder="please confirm your password" />
             <div v-if="errors.confirmPassword" class="text-danger">
               {{ errors.confirmPassword }}
             </div>
@@ -100,10 +102,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router'
-import { useAuth } from '@/components/composables/auth'
+import { useUser } from '@/Firebase/user'
 
 const router = useRouter()
-const { login } = useAuth()
+const { login, register, userAuthenticated, userState } = useUser()
 
 const formData = ref({
   userEmail: '',
@@ -126,6 +128,23 @@ const errors = ref({
   confirmPassword: '',
   gender: ''
 });
+
+const clearInput = (input) => {
+  if (typeof input !== 'string') return input
+  return input
+    .replace(/[<>]/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .trim()
+}
+
+const clearFormData = () => {
+  formData.value.userEmail = clearInput(formData.value.userEmail)
+  formData.value.password = clearInput(formData.value.password)
+  formData.value.confirmPassword = clearInput(formData.value.confirmPassword)
+  formData.value.role = clearInput(formData.value.role)
+  formData.value.gender = clearInput(formData.value.gender)
+}
 
 
 const isvaildEmail = (blur) => {
@@ -193,16 +212,23 @@ const isvaildPassword = (blur) => {
 }
 
 
-const submitForm = () => {
+const submitForm = async () => {
+
+  clearFormData()
+
   const okEmail = isvaildEmail(true)
   const okPwd = isvaildPassword(true)
   const okConfirm = validateConfirmPassword(true)
   if (!okEmail || !okPwd || !okConfirm) return
 
-  const { ok, msg } = login(formData.value.userEmail, formData.value.password)
-  if (!ok) {
-    errors.value.password = msg || 'Invalid email or password'
-    return
+  let result = await login(formData.value.userEmail, formData.value.password)
+
+  if (!result.success) {
+    result = await register(formData.value.userEmail, formData.value.password)
+    if (!result.success) {
+      errors.value.password = result.message || 'Login/Register failed'
+      return
+    }
   }
 
   submittedCards.value.push({

@@ -7,18 +7,15 @@
 </template>
 
 <script setup>
-import { useAuth } from '@/components/composables/auth'
+import { useUser } from '@/Firebase/user'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-const { isAuthenticated, userRole } = useAuth()
+const { userAuthenticated } = useUser()
 const router = useRouter()
 
 onMounted(() => {
-  if (!isAuthenticated.value || !['As_patient', 'As_hcp'].includes(userRole.value)) {
-    router.push('/')
-  }
-  if (!isAuthenticated.value) {
+  if (!userAuthenticated.value) {
     alert('please login first')
     router.push('/')
   }

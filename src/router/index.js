@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
-import { useAuth } from '@/components/composables/auth'
+import { useUser } from '@/Firebase/user'
 import ScoreView from '../views/ScoreView.vue'
 
 const routes = [
@@ -32,14 +32,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const { isAuthenticated, userRole } = useAuth()
-  if (to.meta?.requiresAuth && !isAuthenticated.value) {
+  const { userAuthenticated } = useUser()
+
+  if (to.meta?.requiresAuth && !userAuthenticated.value) {
     alert('please login first')
-    return '/'
-  }
-  if (to.meta?.roles && !to.meta.roles.includes(userRole.value)) {
-    alert('wrong account please try again')
-    return '/'
+    return false
   }
 
   return true
