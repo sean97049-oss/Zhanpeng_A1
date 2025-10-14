@@ -13,6 +13,9 @@
         <li class="nav-item">
           <router-link to="/score" class="nav-link" active-class="active">Score</router-link>
         </li>
+        <li class="nav-item">
+          <router-link to="/glucose" class="nav-link" active-class="active">Glucose</router-link>
+        </li>
       </ul>
 
 

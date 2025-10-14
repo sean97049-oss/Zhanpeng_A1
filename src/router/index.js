@@ -6,6 +6,8 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import { auth } from '@/Firebase/firebase.js'
 import { useUser } from '@/Firebase/user'
+import sgMail from '@sendgrid/mail'
+import GlucoseTableView from '@/views/GlucoseTableView.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -13,6 +15,7 @@ const routes = [
   { path: '/score', name: 'Score', component: ScoreView, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: LoginView },
   { path: '/register', name: 'Register', component: RegisterView },
+  { path: '/glucose', name: 'Glucose', component: GlucoseTableView },
 ]
 
 const router = createRouter({
