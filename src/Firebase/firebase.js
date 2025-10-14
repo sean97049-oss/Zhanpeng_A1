@@ -12,7 +12,13 @@ const firebaseConfig = {
   measurementId: 'G-K4P5Z7KSGG',
 }
 
-const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
-export const db = getFirestore(app)
-export default app
+// 添加错误处理
+try {
+  const app = initializeApp(firebaseConfig)
+  export const auth = getAuth(app)
+  export const db = getFirestore(app)
+  export default app
+} catch (error) {
+  console.error('Firebase initialization error:', error)
+  // 提供备用配置或禁用 Firebase 功能
+}
