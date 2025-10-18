@@ -226,7 +226,6 @@ const refreshUsers = () => {
 }
 
 const editUser = (user) => {
-  // Implement edit functionality
   console.log('Edit user:', user)
 }
 
@@ -493,7 +492,6 @@ onMounted(() => {
   border-left: 4px solid #28a745;
 }
 
-/* 响应式设计 */
 @media (max-width: 1200px) {
   .tables-container {
     flex-direction: column;

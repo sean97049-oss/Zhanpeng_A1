@@ -89,6 +89,20 @@ const route = useRoute()
 const router = useRouter()
 const { register, errorMsg, setUserRoleOnRegister } = useUser()
 
+const LOCAL_ROLES_KEY = 'userEmailToRole'
+
+function readLocalRoles() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_ROLES_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function writeLocalRoles(map) {
+  localStorage.setItem(LOCAL_ROLES_KEY, JSON.stringify(map))
+}
+
 const formData = ref({
   userEmail: (route.query.email ? String(route.query.email) : ''),
   password: '',
@@ -183,7 +197,12 @@ const onRegister = async () => {
   loadingBtn.value = false
 
   if (res.success) {
-    setUserRoleOnRegister(formData.value.userEmail, formData.value.role)
+    const map = readLocalRoles()
+    map[formData.value.userEmail] = formData.value.role
+    writeLocalRoles(map)
+    
+    await setUserRoleOnRegister(formData.value.userEmail, formData.value.role)
+    alert('Registration successful! Welcome to our diabetes support community.')
     const redirect = route.query.redirect || '/about'
     router.replace(String(redirect))
   }

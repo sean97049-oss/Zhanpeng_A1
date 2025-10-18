@@ -40,10 +40,29 @@ function writeLocalRoles(map) {
   localStorage.setItem(LOCAL_ROLES_KEY, JSON.stringify(map))
 }
 
-export function setUserRoleOnRegister(email, role) {
+export async function setUserRoleOnRegister(email, role) {
   const map = readLocalRoles()
   map[email] = role
   writeLocalRoles(map)
+
+  try {
+    const db = getFirestore()
+    if (auth.currentUser) {
+      const userRef = doc(db, 'users', auth.currentUser.uid)
+      await setDoc(
+        userRef,
+        {
+          email: email,
+          role: role,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      )
+    }
+  } catch (error) {
+    console.error('Error saving role to Firestore:', error)
+  }
 }
 
 function checkIsAdminByEmail(email) {
@@ -68,17 +87,20 @@ onAuthStateChanged(auth, async (user) => {
     const snap = await getDoc(userRef)
 
     if (!snap.exists()) {
+      const map = readLocalRoles()
+      const role = map[user.email] || 'As_patient'
+
       await setDoc(
         userRef,
         {
           email: user.email || '',
-          role: 'As_patient',
+          role: role,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         },
         { merge: true },
       )
-      isAdmin.value = false
+      isAdmin.value = role === 'As_hcp'
     } else {
       const role = snap.data().role || 'As_patient'
       isAdmin.value = role === 'As_hcp'

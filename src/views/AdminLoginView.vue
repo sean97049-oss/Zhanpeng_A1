@@ -142,14 +142,12 @@ const onAdminLogin = async () => {
   loadingBtn.value = false
 
   if (res.success) {
-    // Wait a bit for the auth state to update
     setTimeout(() => {
       const { isAdmin } = useUser()
       if (isAdmin.value) {
         router.replace('/manage-account')
       } else {
         alert('Access denied. Admin privileges required.')
-        // Logout non-admin users
         const { logout } = useUser()
         logout()
       }
