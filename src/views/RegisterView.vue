@@ -200,7 +200,7 @@ const onRegister = async () => {
     const map = readLocalRoles()
     map[formData.value.userEmail] = formData.value.role
     writeLocalRoles(map)
-    
+
     await setUserRoleOnRegister(formData.value.userEmail, formData.value.role)
     alert('Registration successful! Welcome to our diabetes support community.')
     const redirect = route.query.redirect || '/about'
