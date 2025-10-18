@@ -7,11 +7,14 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from 'firebase/auth'
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { auth } from './firebase.js'
 
 const userAuthenticated = ref(false)
 const errorMsg = ref('')
 const userState = ref(null)
+const isAdmin = ref(false)
+const LOCAL_ROLES_KEY = 'userEmailToRole'
 setPersistence(auth, browserLocalPersistence).catch(() => {})
 
 function mapError(err) {
@@ -25,13 +28,64 @@ function mapError(err) {
   return 'error'
 }
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    userAuthenticated.value = true
-    userState.value = user.email || null
-  } else {
+function readLocalRoles() {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_ROLES_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function writeLocalRoles(map) {
+  localStorage.setItem(LOCAL_ROLES_KEY, JSON.stringify(map))
+}
+
+export function setUserRoleOnRegister(email, role) {
+  const map = readLocalRoles()
+  map[email] = role
+  writeLocalRoles(map)
+}
+
+function checkIsAdminByEmail(email) {
+  const map = readLocalRoles()
+  return map[email] === 'As_hcp'
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
     userAuthenticated.value = false
     userState.value = null
+    isAdmin.value = false
+    return
+  }
+
+  userAuthenticated.value = true
+  userState.value = user.email || null
+
+  try {
+    const db = getFirestore()
+    const userRef = doc(db, 'users', user.uid)
+    const snap = await getDoc(userRef)
+
+    if (!snap.exists()) {
+      await setDoc(
+        userRef,
+        {
+          email: user.email || '',
+          role: 'As_patient',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      )
+      isAdmin.value = false
+    } else {
+      const role = snap.data().role || 'As_patient'
+      isAdmin.value = role === 'As_hcp'
+    }
+  } catch (error) {
+    console.error('Error checking user role:', error)
+    isAdmin.value = false
   }
 })
 
@@ -69,5 +123,5 @@ export function useUser() {
     }
   }
 
-  return { userAuthenticated, userState, errorMsg, login, logout, register }
+  return { userAuthenticated, userState, errorMsg, isAdmin, login, logout, register }
 }

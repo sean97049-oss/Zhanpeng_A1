@@ -17,8 +17,23 @@ import Header from './components/Header.vue'
 </template>
 
 <style scoped>
+.main-container {
+  min-height: 100vh;
+}
+
 header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
   line-height: 1.5;
+}
+
+.main-box {
+  margin-top: 88px;
+  min-height: calc(100vh - 88px);
 }
 
 .logo {

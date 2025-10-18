@@ -1,56 +1,54 @@
 <template>
-  <div class="login-container">
-    <div class="login-wrapper">
-      <div class="login-left">
-        <div class="login-form-container">
-          <h2 class="login-title">Welcome Back</h2>
-          <p class="login-subtitle">Sign in to your account</p>
+  <div class="admin-login-container">
+    <div class="admin-login-wrapper">
+      <div class="admin-login-left">
+        <div class="admin-login-form-container">
+          <div class="admin-badge">
+            <i class="pi pi-shield"></i>
+            <span>Admin Portal</span>
+          </div>
+          <h2 class="admin-login-title">Administrator Access</h2>
+          <p class="admin-login-subtitle">Sign in to manage the system</p>
 
-          <form @submit.prevent="onLogin" class="login-form">
+          <form @submit.prevent="onAdminLogin" class="admin-login-form">
             <div class="form-group">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" class="form-input" id="email" v-model="formData.userEmail"
-                placeholder="Enter your email" @blur="() => isvaildEmail(true)" @input="() => isvaildEmail(false)"
+              <label for="adminEmail" class="form-label">Admin Email</label>
+              <input type="email" class="form-input" id="adminEmail" v-model="formData.userEmail"
+                placeholder="Enter admin email" @blur="() => isvaildEmail(true)" @input="() => isvaildEmail(false)"
                 required />
               <div v-if="errors.userEmail" class="error-message">{{ errors.userEmail }}</div>
             </div>
 
             <div class="form-group">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-input" id="password" v-model="formData.password"
-                placeholder="Enter your password" @blur="() => isvaildPassword(true)"
+              <label for="adminPassword" class="form-label">Admin Password</label>
+              <input type="password" class="form-input" id="adminPassword" v-model="formData.password"
+                placeholder="Enter admin password" @blur="() => isvaildPassword(true)"
                 @input="() => isvaildPassword(false)" minlength="8" required />
               <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
             </div>
 
             <div v-if="errorMsg" class="error-message main-error">{{ errorMsg }}</div>
 
-            <div v-if="showGoRegister" class="register-suggestion">
-              <router-link class="suggestion-link" :to="{ path: '/register', query: { email: formData.userEmail } }">
-                Account not exist, go to register
-              </router-link>
-            </div>
-
-            <button type="submit" class="login-btn" :disabled="loadingBtn">
+            <button type="submit" class="admin-login-btn" :disabled="loadingBtn">
               <span v-if="loadingBtn">Signing in...</span>
-              <span v-else>Sign In</span>
+              <span v-else>Access Admin Panel</span>
             </button>
 
-            <div class="login-footer">
+            <div class="admin-login-footer">
               <button type="button" class="clear-btn" @click="clearAgain">Clear</button>
-              <p class="register-text">
-                Don't have an account?
-                <router-link to="/register" class="register-link">Create Account</router-link>
+              <p class="back-to-login">
+                <router-link to="/login" class="back-link">← Back to User Login</router-link>
               </p>
             </div>
           </form>
         </div>
       </div>
 
-      <div class="login-right">
+      <div class="admin-login-right">
         <div class="image-container">
-          <img src="@/assets/login.png" alt="Login" class="login-image" />
+          <img src="@/assets/adamin.png" alt="Admin Login" class="admin-login-image" />
         </div>
+
       </div>
     </div>
   </div>
@@ -66,19 +64,13 @@ const router = useRouter()
 const { login, errorMsg } = useUser()
 
 const formData = ref({
-  userEmail: (route.query.email ? String(route.query.email) : ''),
-  password: '',
-  confirmPassword: '',
-  role: '',
-  gender: ''
+  userEmail: '',
+  password: ''
 })
 
 const errors = ref({
   userEmail: '',
-  password: '',
-  confirmPassword: '',
-  role: '',
-  gender: ''
+  password: ''
 })
 
 const clearInput = (input) => {
@@ -93,9 +85,6 @@ const clearInput = (input) => {
 const clearFormData = () => {
   formData.value.userEmail = clearInput(formData.value.userEmail)
   formData.value.password = clearInput(formData.value.password)
-  formData.value.confirmPassword = clearInput(formData.value.confirmPassword)
-  formData.value.role = clearInput(formData.value.role)
-  formData.value.gender = clearInput(formData.value.gender)
 }
 
 const isvaildEmail = (blur) => {
@@ -106,17 +95,6 @@ const isvaildEmail = (blur) => {
     errors.value.userEmail = ''
   }
   return ok
-}
-
-const validateConfirmPassword = (showError = false) => {
-  const password = formData.value.password
-  const confirm = formData.value.confirmPassword
-  errors.value.confirmPassword = ''
-  if (showError && confirm !== password) {
-    errors.value.confirmPassword = 'Passwords do not match'
-    return false
-  }
-  return true
 }
 
 const isvaildPassword = (blur) => {
@@ -147,21 +125,13 @@ const isvaildPassword = (blur) => {
 const clearAgain = () => {
   formData.value.userEmail = ''
   formData.value.password = ''
-  formData.value.role = ''
-  formData.value.confirmPassword = ''
-  formData.value.gender = ''
-
   errors.value.userEmail = ''
   errors.value.password = ''
-  errors.value.role = ''
-  errors.value.confirmPassword = ''
-  errors.value.gender = ''
 }
 
 const loadingBtn = ref(false)
-const showGoRegister = computed(() => errorMsg.value.includes('email not exit') || errorMsg.value.includes('invalid email'))
 
-const onLogin = async () => {
+const onAdminLogin = async () => {
   clearFormData()
   const okEmail = isvaildEmail(true)
   const okPwd = isvaildPassword(true)
@@ -172,14 +142,24 @@ const onLogin = async () => {
   loadingBtn.value = false
 
   if (res.success) {
-    const redirect = route.query.redirect || '/about'
-    router.replace(String(redirect))
+    // Wait a bit for the auth state to update
+    setTimeout(() => {
+      const { isAdmin } = useUser()
+      if (isAdmin.value) {
+        router.replace('/manage-account')
+      } else {
+        alert('Access denied. Admin privileges required.')
+        // Logout non-admin users
+        const { logout } = useUser()
+        logout()
+      }
+    }, 1000)
   }
 }
 </script>
 
 <style scoped>
-.login-container {
+.admin-login-container {
   min-height: 100vh;
   background: #f8f9fa;
   display: flex;
@@ -188,10 +168,10 @@ const onLogin = async () => {
   padding: 2rem;
 }
 
-.login-wrapper {
+.admin-login-wrapper {
   background: white;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   display: flex;
   max-width: 1000px;
@@ -199,7 +179,7 @@ const onLogin = async () => {
   min-height: 600px;
 }
 
-.login-left {
+.admin-login-left {
   flex: 1;
   padding: 3rem;
   display: flex;
@@ -207,27 +187,44 @@ const onLogin = async () => {
   justify-content: center;
 }
 
-.login-form-container {
+.admin-login-form-container {
   width: 100%;
   max-width: 400px;
 }
 
-.login-title {
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.admin-badge i {
+  font-size: 1rem;
+}
+
+.admin-login-title {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #0b2540;
+  color: #0d6efd;
   margin-bottom: 0.5rem;
   text-align: center;
 }
 
-.login-subtitle {
+.admin-login-subtitle {
   color: #6c757d;
   text-align: center;
   margin-bottom: 2rem;
   font-size: 1.1rem;
 }
 
-.login-form {
+.admin-login-form {
   width: 100%;
 }
 
@@ -239,7 +236,7 @@ const onLogin = async () => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #0b2540;
+  color: #0d6efd;
   font-size: 0.95rem;
 }
 
@@ -276,23 +273,7 @@ const onLogin = async () => {
   margin-bottom: 1rem;
 }
 
-.register-suggestion {
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.suggestion-link {
-  color: #0d6efd;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-.suggestion-link:hover {
-  text-decoration: underline;
-}
-
-.login-btn {
+.admin-login-btn {
   width: 100%;
   background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
   color: white;
@@ -306,18 +287,18 @@ const onLogin = async () => {
   margin-bottom: 1.5rem;
 }
 
-.login-btn:hover:not(:disabled) {
+.admin-login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
 }
 
-.login-btn:disabled {
+.admin-login-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
 
-.login-footer {
+.admin-login-footer {
   text-align: center;
 }
 
@@ -337,36 +318,38 @@ const onLogin = async () => {
   background: #5a6268;
 }
 
-.register-text {
-  color: #6c757d;
+.back-to-login {
   margin: 0;
-  font-size: 0.95rem;
 }
 
-.register-link {
+.back-link {
   color: #0d6efd;
   text-decoration: none;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
-.register-link:hover {
+.back-link:hover {
   text-decoration: underline;
 }
 
-.login-right {
+.admin-login-right {
   flex: 1;
   background: #e7f3ff;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  position: relative;
 }
 
 .image-container {
   text-align: center;
+  margin-bottom: 2rem;
 }
 
-.login-image {
+.admin-login-image {
   max-width: 100%;
   height: auto;
   max-height: 500px;
@@ -374,22 +357,62 @@ const onLogin = async () => {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
+.admin-features {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-features h3 {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.admin-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-features li {
+  color: white;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.admin-features li i {
+  color: #e74c3c;
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
-  .login-wrapper {
+  .admin-login-wrapper {
     flex-direction: column;
     margin: 1rem;
   }
 
-  .login-left {
+  .admin-login-left {
     padding: 2rem;
   }
 
-  .login-right {
+  .admin-login-right {
     padding: 1rem;
   }
 
-  .login-title {
+  .admin-login-title {
     font-size: 2rem;
+  }
+
+  .admin-features {
+    padding: 1rem;
   }
 }
 </style>

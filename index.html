@@ -13,8 +13,9 @@
                    script-src 'self' 'unsafe-inline' https://www.gstatic.com; 
                    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
                    font-src 'self' https://fonts.gstatic.com; 
-                   img-src 'self' data: https:; 
-                   connect-src 'self' https://*.firebaseapp.com https://*.googleapis.com;"
+                   img-src 'self' data: https: blob: https://api.mapbox.com https://*.tiles.mapbox.com; 
+                   connect-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://api.mapbox.com https://events.mapbox.com https://*.tiles.mapbox.com; 
+                   worker-src blob:;"
     />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <!-- <meta http-equiv="X-Frame-Options" content="DENY" /> -->

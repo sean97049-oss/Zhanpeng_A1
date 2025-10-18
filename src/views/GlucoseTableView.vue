@@ -1,27 +1,32 @@
 <template>
-  <div class="container page mx-auto p-4">
-    <h2 class="mb-3 text-2xl font-bold">Blood Glucose Records</h2>
+  <div class="glucose-page">
+    <div class="glucose-container">
+      <h2 class="page-title">Blood Glucose Records</h2>
+      <p class="page-subtitle">Track and manage your blood glucose levels for better diabetes control</p>
 
-    <div class="d-flex justify-content-center gap-4 glucose-center">
-      <div class="glucose-card">
-        <div class="card">
-          <h3 class="mb-2">Fasting Glucose Table</h3>
+      <div class="tables-container">
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title">
+              <i class="pi pi-sun"></i>
+              Fasting Glucose Records
+            </h3>
+            <div class="table-actions">
+              <Button icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter1()" class="action-btn" />
+              <span class="search-container">
+                <i class="pi pi-search" />
+                <InputText v-model="filters1['global'].value" placeholder="Search..." class="search-input" />
+              </span>
+              <Button label="CSV" icon="pi pi-download" outlined @click="fastingTable?.exportCSV()"
+                class="action-btn" />
+              <Button label="PDF" icon="pi pi-file-pdf" severity="danger" outlined @click="exportFastingPDF"
+                class="action-btn" />
+            </div>
+          </div>
 
           <DataTable :tableStyle="{ width: '100%' }" ref="fastingTable" v-model:filters="filters1" :value="fastingLogs"
             paginator :rows="10" filterDisplay="row" :globalFilterFields="['date', 'time', 'fastingLevel', 'status']"
-            dataKey="id">
-            <template #header>
-              <div class="flex justify-content-between align-items-center">
-                <Button icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter1()" />
-                <span class="p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters1['global'].value" placeholder="Search keyword" />
-                </span>
-                <Button label="CSV" icon="pi pi-download" outlined @click="fastingTable?.exportCSV()" />
-                <Button label="PDF" icon="pi pi-file-pdf" severity="danger" outlined @click="exportFastingPDF" />
-              </div>
-            </template>
-
+            dataKey="id" class="glucose-table">
             <Column field="date" header="Date" sortable filter filterPlaceholder="Search by date"></Column>
             <Column field="time" header="Time" sortable filter filterPlaceholder="Search by time"></Column>
             <Column field="fastingLevel" header="Fasting (mmol/L)" sortable filter filterPlaceholder="Search by value">
@@ -34,27 +39,29 @@
             </Column>
           </DataTable>
         </div>
-      </div>
 
-      <div class="glucose-card">
-        <div class="card">
-          <h3 class="mb-2">After-Meal Glucose Table</h3>
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title">
+              <i class="pi pi-moon"></i>
+              After Meal Glucose Records
+            </h3>
+            <div class="table-actions">
+              <Button icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter2()" class="action-btn" />
+              <span class="search-container">
+                <i class="pi pi-search" />
+                <InputText v-model="filters2['global'].value" placeholder="Search..." class="search-input" />
+              </span>
+              <Button label="CSV" icon="pi pi-download" outlined @click="afterMealTable?.exportCSV()"
+                class="action-btn" />
+              <Button label="PDF" icon="pi pi-file-pdf" severity="danger" outlined @click="exportAfterPDF"
+                class="action-btn" />
+            </div>
+          </div>
 
           <DataTable :tableStyle="{ width: '100%' }" ref="afterMealTable" v-model:filters="filters2"
             :value="afterMealLogs" paginator :rows="10" filterDisplay="row"
-            :globalFilterFields="['date', 'time', 'afterMealLevel', 'status']" dataKey="id">
-            <template #header>
-              <div class="flex justify-content-between align-items-center">
-                <Button icon="pi pi-filter-slash" label="Clear" outlined @click="clearFilter2()" />
-                <span class="p-input-icon-left">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters2['global'].value" placeholder="Search keyword" />
-                </span>
-                <Button label="CSV" icon="pi pi-download" outlined @click="afterMealTable?.exportCSV()" />
-                <Button label="PDF" icon="pi pi-file-pdf" severity="danger" outlined @click="exportAfterPDF" />
-              </div>
-            </template>
-
+            :globalFilterFields="['date', 'time', 'afterMealLevel', 'status']" dataKey="id" class="glucose-table">
             <Column field="date" header="Date" sortable filter filterPlaceholder="Search by date"></Column>
             <Column field="time" header="Time" sortable filter filterPlaceholder="Search by time"></Column>
             <Column field="afterMealLevel" header="After Meal (mmol/L)" sortable filter
@@ -220,33 +227,190 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
+.glucose-page {
+  padding: 2rem;
+  background: linear-gradient(180deg, #f5f9ff 0%, #ffffff 60%);
+  min-height: calc(100vh - 88px);
+}
+
+.glucose-container {
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.page {
-  margin-top: 120px;
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0b2540;
+  margin-bottom: 0.5rem;
+  text-align: center;
 }
 
-.card {
+.page-subtitle {
+  color: #6c757d;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.tables-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(13, 110, 253, 0.1);
   border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 16px;
-  width: 100%;
 }
 
-:deep(.p-datatable-table) {
-  width: 100%;
+.table-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #428bfa;
 }
 
-.glucose-center {
-  width: 100%;
-  margin: 0 auto;
+.table-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0b2540;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.glucose-card {
-  flex: 1 1 0;
-  min-width: 720px;
+.table-title i {
+  color: #438cfb;
+  font-size: 1.2rem;
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e9ecef;
+  min-width: 200px;
+}
+
+.search-container i {
+  color: #6c757d;
+  margin-right: 0.5rem;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+:deep(.p-datatable) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.p-datatable-header) {
+  background: #4e95ff;
+  color: white;
+  border: none;
+}
+
+:deep(.p-datatable-thead > tr > th) {
+  background: #4c85db;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+:deep(.p-datatable-tbody > tr > td) {
+  padding: 1rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+:deep(.p-datatable-tbody > tr:hover) {
+  background: #f8f9fa;
+}
+
+:deep(.p-datatable-footer) {
+  background: #f8f9fa;
+  border: none;
+  padding: 1rem;
+}
+
+:deep(.p-paginator) {
+  background: #f8f9fa;
+  border: none;
+  padding: 1rem;
+}
+
+:deep(.p-paginator .p-paginator-page) {
+  background: white;
+  border: 1px solid #e9ecef;
+  color: #0d6efd;
+}
+
+:deep(.p-paginator .p-paginator-page.p-highlight) {
+  background: #0d6efd;
+  color: white;
+}
+
+:deep(.p-paginator .p-paginator-page:hover) {
+  background: #0b5ed7;
+  color: white;
+}
+
+@media (max-width: 1200px) {
+  .tables-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .glucose-page {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .search-container {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .table-card {
+    padding: 1rem;
+  }
 }
 </style>

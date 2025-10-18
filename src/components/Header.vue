@@ -8,13 +8,21 @@
         </li>
         <li class="nav-item">
           <router-link to="/about" class="nav-link" active-class="active">About</router-link>
-
         </li>
-        <li class="nav-item">
+        <li class="nav-item" v-if="!isAdmin">
           <router-link to="/score" class="nav-link" active-class="active">Score</router-link>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" v-if="!isAdmin">
           <router-link to="/glucose" class="nav-link" active-class="active">Glucose</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/map" class="nav-link" active-class="active">Map</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/openai" class="nav-link" active-class="active">AI Assistant</router-link>
+        </li>
+        <li class="nav-item" v-if="isAdmin">
+          <router-link to="/manage-account" class="nav-link" active-class="active">Manage</router-link>
         </li>
       </ul>
 
@@ -24,8 +32,9 @@
         <button class="btn btn-sm btn-outline-danger" @click="onLogout">Logout</button>
       </div>
 
-      <div v-else class="ms-auto">
+      <div v-else class="ms-auto d-flex gap-2">
         <router-link class="btn btn-sm btn-outline-primary" to="/login">Login</router-link>
+        <router-link class="btn btn-sm btn-outline-danger" to="/admin-login">Admin</router-link>
       </div>
     </div>
   </header>
@@ -35,9 +44,7 @@
 import { useUser } from '@/Firebase/user'
 import { useRouter } from 'vue-router'
 
-const { userAuthenticated } = useUser()
-
-const { userState } = useUser()
+const { userAuthenticated, userState, isAdmin } = useUser()
 
 const router = useRouter()
 

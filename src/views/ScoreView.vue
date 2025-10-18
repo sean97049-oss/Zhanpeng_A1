@@ -1,83 +1,95 @@
 <template>
-  <div class="container mt-5" style="max-width:860px">
-    <h3 class="mb-3">Score system</h3>
+  <div class="score-page">
+    <div class="score-container">
+      <h2 class="page-title">Score System</h2>
+      <p class="page-subtitle">Rate and track your experience with our diabetes management system</p>
 
-    <div class="card p-3 mb-3">
-      <div class="d-flex flex-column gap-2">
-        <div class="d-flex align-items-center justify-content-between">
-          <span class="fw-semibold">Difficulty</span>
-          <Rating v-model="score.difficulty" :cancel="false" />
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-          <span class="fw-semibold">Helpfulness</span>
-          <Rating v-model="score.helpfulness" :cancel="false" />
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-          <span class="fw-semibold">Guidance</span>
-          <Rating v-model="score.guidance" :cancel="false" />
-        </div>
-        <div class="d-flex align-items-center justify-content-between">
-          <span class="fw-semibold">Design</span>
-          <Rating v-model="score.design" :cancel="false" />
-        </div>
-        <div class="d-flex align-items-center gap-2 mt-2">
-          <Button label="Submit" icon="pi pi-check" @click="finalRate" :disabled="!isComplete" />
-          <Button label="Clear all" icon="pi pi-trash" severity="secondary" outlined @click="reset" />
-          <span class="ms-auto">Overall score: <strong>{{ averageOverall }}</strong>（{{ list.length }}）</span>
-        </div>
-      </div>
-      <div class="mt-2 small text-muted">
-        overall score: {{ avgDifficulty }} ｜ helpful {{ avgHelpfulness }} ｜ guidance {{ avgGuidance }} ｜ design {{
-          avgDesign }}
-      </div>
-    </div>
-
-    <div class="card p-3">
-      <DataTable :value="rows" tableStyle="min-width: 40rem">
-        <template #header>
-          <div class="d-flex align-items-center justify-content-between w-100">
-            <span class="fs-5 fw-bold">Ratings</span>
-            <Button icon="pi pi-refresh" rounded text @click="reload" />
+      <div class="rating-card">
+        <div class="rating-form">
+          <div class="rating-item">
+            <span class="rating-label">Difficulty</span>
+            <Rating v-model="score.difficulty" :cancel="false" />
           </div>
-        </template>
+          <div class="rating-item">
+            <span class="rating-label">Helpfulness</span>
+            <Rating v-model="score.helpfulness" :cancel="false" />
+          </div>
+          <div class="rating-item">
+            <span class="rating-label">Guidance</span>
+            <Rating v-model="score.guidance" :cancel="false" />
+          </div>
+          <div class="rating-item">
+            <span class="rating-label">Design</span>
+            <Rating v-model="score.design" :cancel="false" />
+          </div>
+          <div class="rating-actions">
+            <Button label="Submit" icon="pi pi-check" @click="finalRate" :disabled="!isComplete" class="submit-btn" />
+            <Button label="Clear all" icon="pi pi-trash" severity="secondary" outlined @click="reset"
+              class="clear-btn" />
+          </div>
+        </div>
+        <div class="rating-summary">
+          <div class="summary-item">
+            <span class="summary-label">Overall Score:</span>
+            <span class="summary-value">{{ averageOverall }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Ratings:</span>
+            <span class="summary-value">{{ list.length }}</span>
+          </div>
+        </div>
+      </div>
 
-        <Column field="index" header="#" style="width: 80px" />
-        <Column header="Difficulty">
-          <template #body="slotProps">
-            <Rating :modelValue="slotProps.data.difficulty" readonly :cancel="false" />
-          </template>
-        </Column>
-        <Column header="Helpfulness">
-          <template #body="slotProps">
-            <Rating :modelValue="slotProps.data.helpfulness" readonly :cancel="false" />
-          </template>
-        </Column>
-        <Column header="Guidance">
-          <template #body="slotProps">
-            <Rating :modelValue="slotProps.data.guidance" readonly :cancel="false" />
-          </template>
-        </Column>
-        <Column header="Design">
-          <template #body="slotProps">
-            <Rating :modelValue="slotProps.data.design" readonly :cancel="false" />
-          </template>
-        </Column>
-        <Column field="overall" header="Overall" style="width:120px" />
-        <Column field="at" header="Time">
-          <template #body="slotProps">
-            {{ formatDate(slotProps.data.at) }}
-          </template>
-        </Column>
-        <Column header="Status" style="width:140px">
-          <template #body="slotProps">
-            <Tag :value="statusLabel(slotProps.data.overall)" :severity="statusSeverity(slotProps.data.overall)" />
-          </template>
-        </Column>
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">
+            <i class="pi pi-star"></i>
+            Rating History
+          </h3>
+          <Button icon="pi pi-refresh" rounded text @click="reload" class="refresh-btn" />
+        </div>
 
-        <template #footer>
-          overallScore: <strong>{{ averageOverall }}</strong> ｜ total <strong>{{ list.length }}</strong> items
-        </template>
-      </DataTable>
+        <DataTable :value="rows" tableStyle="min-width: 40rem" class="rating-table">
+          <Column field="index" header="#" style="width: 80px" />
+          <Column header="Difficulty">
+            <template #body="slotProps">
+              <Rating :modelValue="slotProps.data.difficulty" readonly :cancel="false" />
+            </template>
+          </Column>
+          <Column header="Helpfulness">
+            <template #body="slotProps">
+              <Rating :modelValue="slotProps.data.helpfulness" readonly :cancel="false" />
+            </template>
+          </Column>
+          <Column header="Guidance">
+            <template #body="slotProps">
+              <Rating :modelValue="slotProps.data.guidance" readonly :cancel="false" />
+            </template>
+          </Column>
+          <Column header="Design">
+            <template #body="slotProps">
+              <Rating :modelValue="slotProps.data.design" readonly :cancel="false" />
+            </template>
+          </Column>
+          <Column field="overall" header="Overall" style="width:120px" />
+          <Column field="at" header="Time">
+            <template #body="slotProps">
+              {{ formatDate(slotProps.data.at) }}
+            </template>
+          </Column>
+          <Column header="Status" style="width:140px">
+            <template #body="slotProps">
+              <Tag :value="statusLabel(slotProps.data.overall)" :severity="statusSeverity(slotProps.data.overall)" />
+            </template>
+          </Column>
+
+          <template #footer>
+            <div class="table-footer">
+              Overall Score: <strong>{{ averageOverall }}</strong> | Total <strong>{{ list.length }}</strong> items
+            </div>
+          </template>
+        </DataTable>
+      </div>
     </div>
   </div>
 </template>
@@ -180,3 +192,226 @@ function averageOf(arr) {
   return Math.round((sum / arr.length) * 10) / 10
 }
 </script>
+
+<style scoped>
+.score-page {
+  padding: 2rem;
+  background: linear-gradient(180deg, #f5f9ff 0%, #ffffff 60%);
+  min-height: calc(100vh - 88px);
+}
+
+.score-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0b2540;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.rating-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(13, 110, 253, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.rating-form {
+  margin-bottom: 2rem;
+}
+
+.rating-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.rating-item:last-of-type {
+  border-bottom: none;
+}
+
+.rating-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.rating-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
+}
+
+.clear-btn {
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.rating-summary {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-around;
+  gap: 2rem;
+}
+
+.summary-item {
+  text-align: center;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(13, 110, 253, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #0d6efd;
+}
+
+.table-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0b2540;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-title i {
+  color: #0d6efd;
+  font-size: 1.2rem;
+}
+
+.refresh-btn {
+  color: #0d6efd;
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+  background: #0d6efd;
+  color: white;
+}
+
+.table-footer {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-top: 1rem;
+}
+
+:deep(.p-datatable) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:deep(.p-datatable-header) {
+  background: #0d6efd;
+  color: white;
+  border: none;
+}
+
+:deep(.p-datatable-thead > tr > th) {
+  background: #0d6efd;
+  color: white;
+  border: none;
+  font-weight: 600;
+  padding: 1rem;
+}
+
+:deep(.p-datatable-tbody > tr > td) {
+  padding: 1rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+:deep(.p-datatable-tbody > tr:hover) {
+  background: #f8f9fa;
+}
+
+:deep(.p-datatable-footer) {
+  background: #f8f9fa;
+  border: none;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .score-page {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .rating-summary {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .rating-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+}
+</style>
